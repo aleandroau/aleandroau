@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>50/20/30 Budget Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    label {
+      display: block;
+      margin-bottom: 10px;
+      color: #333;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+    button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin-top: 20px;
+      background-color: #4CAF50;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    h2 {
+      margin-top: 30px;
+      color: #333;
+    }
+    p {
+      margin-bottom: 10px;
+      color: #333;
+    }
+    span {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>50/20/30 Budget Calculator</h1>
+  
+  <label for="pay">Enter your pay:</label>
+  <input type="number" id="pay" required>
+  
+  <button onclick="calculateBudget()">Calculate Budget</button>
+  
+  <h2>Budget Breakdown:</h2>
+  <p>Superannuation (11%): <span id="superannuation"></span></p>
+  <p>Remaining Pay: <span id="remainingPay"></span></p>
+  <p>General Savings (50%): <span id="needs"></span></p>
+  <p>Savings Goal (30%): <span id="wants"></span></p>
+  <p>Emergency Fund (20%): <span id="savings"></span></p>
+  
+  <script>
+    function calculateBudget() {
+      const pay = parseFloat(document.getElementById('pay').value);
+      const superannuation = pay * 0.11;
+      const remainingPay = pay - superannuation;
+      
+      const needs = remainingPay * 0.5;
+      const wants = remainingPay * 0.3;
+      const savings = remainingPay * 0.2;
+      
+      document.getElementById('superannuation').textContent = '$' + superannuation.toFixed(2);
+      document.getElementById('remainingPay').textContent = '$' + remainingPay.toFixed(2);
+      document.getElementById('needs').textContent = '$' + needs.toFixed(2);
+      document.getElementById('wants').textContent = '$' + wants.toFixed(2);
+      document.getElementById('savings').textContent = '$' + savings.toFixed(2);
+    }
+  </script>
+</body>
+</html>
