@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fortnightly Pay Split Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            padding: 40px;
+        }
+        
+        .pay-input-section {
+            background: #f8fafc;
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid #e2e8f0;
+            margin-bottom: 40px;
+            transition: all 0.3s ease;
+        }
+        
+        .pay-input-section:hover {
+            border-color: #4facfe;
+            transform: translateY(-2px);
+        }
+        
+        .pay-input-section h3 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            text-align: center;
+        }
+        
+        .pay-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #cbd5e0;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            transition: border-color 0.3s ease;
+            text-align: center;
+        }
+        
+        .pay-input:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+        
+        .shared-accounts {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+        }
+        
+        .shared-accounts h2 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            text-align: center;
+        }
+        
+        .shared-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .shared-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .shared-item h4 {
+            color: #4a5568;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .shared-amount {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2b6cb0;
+        }
+        
+        .personal-section {
+            background: #f7fafc;
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .personal-section h2 {
+            color: #2d3748;
+            margin-bottom: 25px;
+            font-size: 1.6rem;
+            text-align: center;
+        }
+        
+        .slider-group {
+            margin-bottom: 25px;
+        }
+        
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .slider-label span {
+            color: #4a5568;
+            font-weight: 500;
+        }
+        
+        .slider-value {
+            color: #2b6cb0;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #e2e8f0;
+            outline: none;
+            appearance: none;
+            cursor: pointer;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+        
+        .amount-display {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2b6cb0;
+        }
+        
+        .total-allocated {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .total-allocated.over {
+            border-color: #e53e3e;
+            background: #fed7d7;
+        }
+        
+        .total-allocated.under {
+            border-color: #38a169;
+            background: #c6f6d5;
+        }
+        
+        .warning {
+            color: #e53e3e;
+            font-weight: bold;
+        }
+        
+        .success {
+            color: #38a169;
+            font-weight: bold;
+        }
+        
+        .total-line {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+            
+            .shared-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🐈‍⬛ Bug and Kipp Pay Split Calculator 🐈</h1>
+            <p>Split your fortnightly pay between shared and personal accounts</p>
+        </div>
+        
+        <div class="main-content">
+            <!-- Pay Input -->
+            <div class="pay-input-section">
+                <h3>Combined Fortnightly Pay</h3>
+                <input type="number" class="pay-input" id="totalPay" placeholder="Enter total amount ($)" min="0" step="0.01">
+            </div>
+            
+            <!-- Shared Accounts -->
+            <div class="shared-accounts">
+                <h2>🏡 Shared Accounts</h2>
+                <div class="shared-grid">
+                    <div class="shared-item">
+                        <h4>Total Income</h4>
+                        <div class="shared-amount" id="totalIncome">$0.00</div>
+                    </div>
+                    <div class="shared-item">
+                        <h4>Shared Transaction Account (10%)</h4>
+                        <div class="shared-amount" id="sharedTransaction">$0.00</div>
+                    </div>
+                    <div class="shared-item">
+                        <h4>Shared Bills Account (20%)</h4>
+                        <div class="shared-amount" id="sharedBills">$0.00</div>
+                    </div>
+                    <div class="shared-item">
+                        <h4>Remaining for Personal Split</h4>
+                        <div class="shared-amount" id="remainingForPersonal">$0.00</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Personal Allocations -->
+            <div class="personal-section">
+                <h2>👤 Personal Allocation (70% of total)</h2>
+                <div id="sliders"></div>
+                <div class="total-allocated" id="totalSection">
+                    <div class="total-line">Total Allocated: <span id="totalPercent">0</span>%</div>
+                    <div class="total-line">Available Amount: <span id="availableAmount">$0.00</span></div>
+                    <div class="total-line">Remaining Unallocated: <span id="remainingAmount">$0.00</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const categories = [
+            'Personal Transaction Account',
+            'Personal Bills Account', 
+            'Personal Short Term Savings Goal',
+            'Personal Long Term Savings Goal',
+            'Personal Emergency Fund',
+            'Personal "Not an Emergency but FEELS Like an Emergency"'
+        ];
+
+        let sliderValues = {};
+
+        // Initialize sliders with default values
+        categories.forEach(category => {
+            sliderValues[category] = 10;
+        });
+
+        function createSliders() {
+            const container = document.getElementById('sliders');
+            
+            categories.forEach(category => {
+                const sliderGroup = document.createElement('div');
+                sliderGroup.className = 'slider-group';
+                
+                const label = document.createElement('div');
+                label.className = 'slider-label';
+                label.innerHTML = `
+                    <span>${category}</span>
+                    <span class="slider-value" id="${category.replace(/[^a-zA-Z0-9]/g, '')}_value">${sliderValues[category]}%</span>
+                `;
+                
+                const slider = document.createElement('input');
+                slider.type = 'range';
+                slider.min = '0';
+                slider.max = '100';
+                slider.value = sliderValues[category];
+                slider.className = 'slider';
+                slider.id = `${category.replace(/[^a-zA-Z0-9]/g, '')}`;
+                
+                const amountDisplay = document.createElement('div');
+                amountDisplay.className = 'amount-display';
+                amountDisplay.id = `${category.replace(/[^a-zA-Z0-9]/g, '')}_amount`;
+                amountDisplay.textContent = '$0.00';
+                
+                slider.addEventListener('input', () => {
+                    sliderValues[category] = parseInt(slider.value);
+                    updateDisplay();
+                });
+                
+                sliderGroup.appendChild(label);
+                sliderGroup.appendChild(slider);
+                sliderGroup.appendChild(amountDisplay);
+                container.appendChild(sliderGroup);
+            });
+        }
+
+        function updateDisplay() {
+            const totalPay = parseFloat(document.getElementById('totalPay').value) || 0;
+            
+            // Update shared accounts
+            document.getElementById('totalIncome').textContent = `$${totalPay.toFixed(2)}`;
+            document.getElementById('sharedTransaction').textContent = `$${(totalPay * 0.1).toFixed(2)}`;
+            document.getElementById('sharedBills').textContent = `$${(totalPay * 0.2).toFixed(2)}`;
+            
+            const remainingForPersonal = totalPay * 0.7; // 70% remaining after shared accounts
+            document.getElementById('remainingForPersonal').textContent = `$${remainingForPersonal.toFixed(2)}`;
+            
+            // Update personal allocations
+            let totalPercent = 0;
+            
+            categories.forEach(category => {
+                const percent = sliderValues[category];
+                const amount = (percent / 100) * remainingForPersonal;
+                totalPercent += percent;
+                
+                // Update slider display
+                const valueElement = document.getElementById(`${category.replace(/[^a-zA-Z0-9]/g, '')}_value`);
+                const amountElement = document.getElementById(`${category.replace(/[^a-zA-Z0-9]/g, '')}_amount`);
+                
+                if (valueElement) valueElement.textContent = `${percent}%`;
+                if (amountElement) amountElement.textContent = `$${amount.toFixed(2)}`;
+            });
+            
+            // Update totals
+            const totalElement = document.getElementById('totalSection');
+            const percentElement = document.getElementById('totalPercent');
+            const availableElement = document.getElementById('availableAmount');
+            const remainingElement = document.getElementById('remainingAmount');
+            
+            percentElement.textContent = totalPercent;
+            availableElement.textContent = `$${remainingForPersonal.toFixed(2)}`;
+            
+            const allocatedAmount = (totalPercent / 100) * remainingForPersonal;
+            const remainingUnallocated = remainingForPersonal - allocatedAmount;
+            remainingElement.textContent = `$${remainingUnallocated.toFixed(2)}`;
+            
+            // Color coding based on allocation
+            totalElement.className = 'total-allocated';
+            if (totalPercent > 100) {
+                totalElement.classList.add('over');
+                percentElement.className = 'warning';
+                remainingElement.className = 'warning';
+            } else if (totalPercent < 100) {
+                totalElement.classList.add('under');
+                percentElement.className = 'success';
+                remainingElement.className = 'success';
+            } else {
+                percentElement.className = 'success';
+                remainingElement.className = 'success';
+            }
+        }
+
+        // Initialize the application
+        createSliders();
+        
+        // Add event listener for pay input
+        document.getElementById('totalPay').addEventListener('input', updateDisplay);
+        
+        // Initial display update
+        updateDisplay();
+    </script>
+</body>
+</html>
