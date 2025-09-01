@@ -246,7 +246,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🐈‍⬛ Bug and Kipp Pay Split Calculator 🐈</h1>
+            <h1>💰 Bug and Kipp Budgetron 98000</h1>
             <p>Split your fortnightly pay between shared and personal accounts</p>
         </div>
         
@@ -261,10 +261,6 @@
             <div class="shared-accounts">
                 <h2>🏡 Shared Accounts</h2>
                 <div class="shared-grid">
-                    <div class="shared-item">
-                        <h4>Total Income</h4>
-                        <div class="shared-amount" id="totalIncome">$0.00</div>
-                    </div>
                     <div class="shared-item">
                         <h4>Shared Transaction Account (10%)</h4>
                         <div class="shared-amount" id="sharedTransaction">$0.00</div>
@@ -338,7 +334,8 @@
                 amountDisplay.textContent = '$0.00';
                 
                 slider.addEventListener('input', () => {
-                    sliderValues[category] = parseInt(slider.value);
+                    const newValue = parseInt(slider.value);
+                    redistributeSliders(category, newValue);
                     updateDisplay();
                 });
                 
@@ -353,14 +350,13 @@
             const totalPay = parseFloat(document.getElementById('totalPay').value) || 0;
             
             // Update shared accounts
-            document.getElementById('totalIncome').textContent = `$${totalPay.toFixed(2)}`;
-            document.getElementById('sharedTransaction').textContent = `$${(totalPay * 0.1).toFixed(2)}`;
-            document.getElementById('sharedBills').textContent = `$${(totalPay * 0.2).toFixed(2)}`;
+            document.getElementById('sharedTransaction').textContent = `${(totalPay * 0.1).toFixed(2)}`;
+            document.getElementById('sharedBills').textContent = `${(totalPay * 0.2).toFixed(2)}`;
             
             const remainingForPersonal = totalPay * 0.7; // 70% remaining after shared accounts
-            document.getElementById('remainingForPersonal').textContent = `$${remainingForPersonal.toFixed(2)}`;
+            document.getElementById('remainingForPersonal').textContent = `${remainingForPersonal.toFixed(2)}`;
             
-            // Update personal allocations
+            // Update personal allocations - always show amounts for current percentages
             let totalPercent = 0;
             
             categories.forEach(category => {
@@ -373,7 +369,7 @@
                 const amountElement = document.getElementById(`${category.replace(/[^a-zA-Z0-9]/g, '')}_amount`);
                 
                 if (valueElement) valueElement.textContent = `${percent}%`;
-                if (amountElement) amountElement.textContent = `$${amount.toFixed(2)}`;
+                if (amountElement) amountElement.textContent = `${amount.toFixed(2)}`;
             });
             
             // Update totals
@@ -383,25 +379,56 @@
             const remainingElement = document.getElementById('remainingAmount');
             
             percentElement.textContent = totalPercent;
-            availableElement.textContent = `$${remainingForPersonal.toFixed(2)}`;
+            availableElement.textContent = `${remainingForPersonal.toFixed(2)}`;
             
             const allocatedAmount = (totalPercent / 100) * remainingForPersonal;
             const remainingUnallocated = remainingForPersonal - allocatedAmount;
-            remainingElement.textContent = `$${remainingUnallocated.toFixed(2)}`;
+            remainingElement.textContent = `${remainingUnallocated.toFixed(2)}`;
             
-            // Color coding based on allocation
+            // Color coding - always show as success since we maintain 100%
             totalElement.className = 'total-allocated';
-            if (totalPercent > 100) {
-                totalElement.classList.add('over');
-                percentElement.className = 'warning';
-                remainingElement.className = 'warning';
-            } else if (totalPercent < 100) {
-                totalElement.classList.add('under');
-                percentElement.className = 'success';
-                remainingElement.className = 'success';
-            } else {
-                percentElement.className = 'success';
-                remainingElement.className = 'success';
+            percentElement.className = 'success';
+            remainingElement.className = 'success';
+        }
+
+        function redistributeSliders(changedCategory, newValue) {
+            const oldValue = sliderValues[changedCategory];
+            const difference = newValue - oldValue;
+            
+            // Update the changed slider
+            sliderValues[changedCategory] = newValue;
+            
+            // Get other categories to redistribute
+            const otherCategories = categories.filter(cat => cat !== changedCategory);
+            const otherTotal = otherCategories.reduce((sum, cat) => sum + sliderValues[cat], 0);
+            
+            if (otherTotal > 0 && difference !== 0) {
+                // Redistribute the difference proportionally among other sliders
+                otherCategories.forEach(category => {
+                    const proportion = sliderValues[category] / otherTotal;
+                    const adjustment = proportion * difference;
+                    const newVal = Math.max(0, Math.min(100, sliderValues[category] - adjustment));
+                    sliderValues[category] = Math.round(newVal);
+                    
+                    // Update the slider element
+                    const sliderElement = document.getElementById(category.replace(/[^a-zA-Z0-9]/g, ''));
+                    if (sliderElement) {
+                        sliderElement.value = sliderValues[category];
+                    }
+                });
+            }
+            
+            // Final adjustment to ensure total is exactly 100
+            const currentTotal = Object.values(sliderValues).reduce((sum, val) => sum + val, 0);
+            if (currentTotal !== 100 && otherCategories.length > 0) {
+                const adjustment = 100 - currentTotal;
+                const adjustCategory = otherCategories[0];
+                sliderValues[adjustCategory] = Math.max(0, Math.min(100, sliderValues[adjustCategory] + adjustment));
+                
+                const adjustSlider = document.getElementById(adjustCategory.replace(/[^a-zA-Z0-9]/g, ''));
+                if (adjustSlider) {
+                    adjustSlider.value = sliderValues[adjustCategory];
+                }
             }
         }
 
